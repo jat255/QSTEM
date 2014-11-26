@@ -58,6 +58,11 @@ handles.output = hObject;
 handles.directoryname = pwd();
 set(handles.edit_directoryname,'String',handles.directoryname);
 
+% if no arguments, display images in current directory:
+if (length(varargin) == 0)
+    handles = pushbutton_SelectDir_Callback(hObject, eventdata, handles, 0, '');
+end
+
 if (length(varargin) > 0)
     inputDir = varargin{1};
     filename = '';
