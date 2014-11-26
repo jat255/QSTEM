@@ -333,7 +333,7 @@ if showInNewWindow
         colormap('default');
         shading interp
     else
-        imagesc(dx*[0:replicateX*Nx-1],dy*[0:replicateY*Ny-1],img);
+        imagesc(dx*[0:replicateX*Nx-1],dy*[0:replicateY*Ny-1],autocontrast(img));
         set(gca,'YDir','normal');
         colormap('gray');
         axis equal; axis tight;
@@ -344,7 +344,7 @@ else
         colormap('default');
         shading interp
     else
-        imagesc(dx*[0:replicateX*Nx-1],dy*[0:replicateY*Ny-1],img,'Parent',handles.axes_Image);
+        imagesc(dx*[0:replicateX*Nx-1],dy*[0:replicateY*Ny-1],autocontrast(img),'Parent',handles.axes_Image);
         set(gca,'YDir','normal');
         colormap('gray');
         axis equal; axis tight;
@@ -618,14 +618,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-
-
-
-
-
-
-
 % --- Executes on button press in pushbutton_Quantify.
 function pushbutton_Quantify_Callback(hObject, eventdata, handles)
 % handles = scaleSTEMImage(handles);
@@ -634,3 +626,53 @@ if isfield(handles,'sourceSize')
     scaleSTEMImage(handles);
 end
 
+% License for autocontrast() function:
+% 
+% Copyright (c) 2005, Divakar Roy
+% All rights reserved.
+% 
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are
+% met:
+% 
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in
+%       the documentation and/or other materials provided with the distribution
+% 
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+
+% AUTOCONTRAST  Automatically adjusts contrast of images to optimum level.
+%    e.g. outIm = autocontrast(inIm)
+function output_img = autocontrast(input_img)
+
+low_limit=0.008;
+up_limit=0.992;
+img=input_img;
+[m1 n1 r1]=size(img);
+img=double(img);
+%--------------------calculation of vmin and vmax----------------------
+for k=1:r1
+    arr=sort(reshape(img(:,:,k),m1*n1,1));
+    v_min(k)=arr(ceil(low_limit*m1*n1));
+    v_max(k)=arr(ceil(up_limit*m1*n1));
+end
+%----------------------------------------------------------------------
+if r1==3
+    v_min=rgb2ntsc(v_min);
+    v_max=rgb2ntsc(v_max);
+end
+%----------------------------------------------------------------------
+img=(img-v_min(1))/(v_max(1)-v_min(1));
+output_img = uint8(img.*255);
