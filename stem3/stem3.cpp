@@ -62,6 +62,8 @@ QSTEM - image simulation for TEM/STEM/CBED
 #include "customslice.h"
 #include "data_containers.h"
 
+#include <iostream>
+
 #define NCINMAX 1024
 #define NPARAM	64    /* number of parameters */
 #define MAX_SCANS 1   /* maximum number of linescans per graph window */
